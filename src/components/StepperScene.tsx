@@ -629,10 +629,42 @@ export default function StepperScene() {
       <AnimatePresence>{sim.xray && <XRayReadouts sim={sim} stepIndex={stepCount} />}</AnimatePresence>
 
       {/* Control Panel (Left -> Bottom on Mobile) */}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-24 md:bottom-auto md:translate-x-0 md:left-5 md:top-1/2 md:-translate-y-1/2 w-[90vw] md:w-64 space-y-3 z-20 pointer-events-none">
-        <GlassPanel className="p-4 md:p-5 space-y-4 md:space-y-5 pointer-events-auto" xray={sim.xray} darkMode={sim.darkMode}>
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-24 md:bottom-auto md:translate-x-0 md:left-5 md:top-1/2 md:-translate-y-1/2 w-[95vw] md:w-64 space-y-3 z-20 pointer-events-none">
+        
+        {/* Mobile-Only Quick Actions Row */}
+        <div className="flex md:hidden gap-2 overflow-x-auto pb-2 px-2 no-scrollbar pointer-events-auto">
+          <button onClick={() => setSim((s) => ({ ...s, xray: !s.xray }))}
+            className={`flex-shrink-0 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+              sim.xray ? "bg-sky-400/20 border-sky-400 text-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.3)]" : "bg-white/10 border-white/10 text-white/40"
+            }`}>
+            X-Ray
+          </button>
+          <button onClick={() => setSim((s) => ({ ...s, exploded: !s.exploded }))}
+            className={`flex-shrink-0 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+              sim.exploded ? "bg-blue-600/20 border-blue-600 text-blue-500" : "bg-white/10 border-white/10 text-white/40"
+            }`}>
+            Exploded
+          </button>
+          <button onClick={() => setSim((s) => ({ ...s, crossSection: !s.crossSection }))}
+            className={`flex-shrink-0 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+              sim.crossSection ? "bg-blue-600/20 border-blue-600 text-blue-500" : "bg-white/10 border-white/10 text-white/40"
+            }`}>
+            Cross Section
+          </button>
+        </div>
+
+        <GlassPanel className="p-4 md:p-5 space-y-4 md:space-y-5 pointer-events-auto shadow-2xl" xray={sim.xray} darkMode={sim.darkMode}>
           <div>
-            <div className="text-[8px] md:text-[9px] tracking-[0.35em] uppercase font-mono mb-3 md:mb-4" style={{ color: `${accent}70` }}>System Dynamics</div>
+            <div className="flex justify-between items-center mb-3 md:mb-4">
+              <div className="text-[8px] md:text-[9px] tracking-[0.35em] uppercase font-mono" style={{ color: `${accent}70` }}>System Dynamics</div>
+              {/* Mobile Inspector Toggle */}
+              <button onClick={() => setSim(s => ({...s, running: !s.running}))} className={`md:hidden px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${
+                sim.running ? "bg-red-500/20 border-red-500/50 text-red-500" : "bg-emerald-500/20 border-emerald-500/50 text-emerald-500"
+              }`}>
+                {sim.running ? "Stop Drive" : "Start Drive"}
+              </button>
+            </div>
+            
             <div className="space-y-4 md:space-y-5">
               <Slider label="Drive Current" unit="A" value={sim.current} min={0.2} max={2.8} step={0.1}
                 onChange={(v) => setSim((s) => ({ ...s, current: v }))} xray={sim.xray} darkMode={sim.darkMode} />
@@ -640,7 +672,8 @@ export default function StepperScene() {
                 onChange={(v) => setSim((s) => ({ ...s, frequency: v }))} xray={sim.xray} darkMode={sim.darkMode} />
             </div>
           </div>
-          <div className="pt-2 border-t border-white/5 grid grid-cols-2 gap-2">
+
+          <div className="pt-2 border-t border-white/5 grid grid-cols-2 md:grid-cols-2 gap-2">
               {[
                 { label: "Holding", value: (sim.current * 0.45).toFixed(2), unit: "N·cm" },
                 { label: "Velocity", value: Math.round((sim.frequency * 60) / 200).toString(), unit: "RPM" },
@@ -651,6 +684,23 @@ export default function StepperScene() {
                    <div className="text-[8px] font-mono opacity-40">{unit}</div>
                 </div>
               ))}
+          </div>
+
+          {/* Mobile Inspector Strip */}
+          <div className="md:hidden pt-3 border-t border-white/5">
+             <div className="text-[7px] tracking-widest uppercase font-bold text-slate-400 mb-2">Part Inspector</div>
+             <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                {["Casing", "Stator", "Windings", "Rotor", "Bearing", "Frame"].map((name) => {
+                  const active = sim.selectedPart === name;
+                  return (
+                    <button key={name} className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black transition-all ${
+                      active ? "bg-blue-600 text-white" : "bg-white/5 text-white/40 border border-white/5"
+                    }`} onClick={(e) => handleClick(name, e)}>
+                      {name}
+                    </button>
+                  );
+                })}
+             </div>
           </div>
         </GlassPanel>
       </div>
