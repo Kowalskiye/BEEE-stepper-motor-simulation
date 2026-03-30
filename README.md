@@ -1,5 +1,6 @@
 # 🐝 BEEE: High-Fidelity Stepper Simulator
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://beeesim.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-r166-000000?style=for-the-badge&logo=three.js)](https://threejs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
