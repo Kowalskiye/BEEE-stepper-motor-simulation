@@ -628,73 +628,65 @@ export default function StepperScene() {
 
       <AnimatePresence>{sim.xray && <XRayReadouts sim={sim} stepIndex={stepCount} />}</AnimatePresence>
 
-      {/* Control Panel (Left -> Bottom on Mobile) */}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-24 md:bottom-auto md:translate-x-0 md:left-5 md:top-1/2 md:-translate-y-1/2 w-[95vw] md:w-64 space-y-3 z-20 pointer-events-none">
+      {/* Control Panel (Left -> Bottom/Compact on Mobile) */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-5 md:bottom-auto md:translate-x-0 md:left-5 md:top-1/2 md:-translate-y-1/2 w-[92vw] md:w-64 space-y-2 md:space-y-3 z-20 pointer-events-none transition-all duration-500">
         
-        {/* Mobile-Only Quick Actions Row */}
-        <div className="flex md:hidden gap-2 overflow-x-auto pb-2 px-2 no-scrollbar pointer-events-auto">
-          <button onClick={() => setSim((s) => ({ ...s, xray: !s.xray }))}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-              sim.xray ? "bg-sky-400/20 border-sky-400 text-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.3)]" : "bg-white/10 border-white/10 text-white/40"
-            }`}>
-            X-Ray
-          </button>
-          <button onClick={() => setSim((s) => ({ ...s, exploded: !s.exploded }))}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-              sim.exploded ? "bg-blue-600/20 border-blue-600 text-blue-500" : "bg-white/10 border-white/10 text-white/40"
-            }`}>
-            Exploded
-          </button>
-          <button onClick={() => setSim((s) => ({ ...s, crossSection: !s.crossSection }))}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-              sim.crossSection ? "bg-blue-600/20 border-blue-600 text-blue-500" : "bg-white/10 border-white/10 text-white/40"
-            }`}>
-            Cross Section
-          </button>
+        {/* Compact Mode Strip (Mobile Only) */}
+        <div className="flex md:hidden gap-1.5 overflow-x-auto pb-1.5 px-1 no-scrollbar pointer-events-auto">
+          {[
+            { id: "xray", label: "X-Ray", active: sim.xray },
+            { id: "exploded", label: "Exploded", active: sim.exploded },
+            { id: "crossSection", label: "Cross", active: sim.crossSection },
+          ].map(m => (
+            <button key={m.id} onClick={() => setSim(s => ({...s, [m.id as keyof SimState]: !s[m.id as keyof SimState]}))}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-tighter border transition-all ${
+                m.active ? "bg-sky-500/20 border-sky-500 text-sky-400" : "bg-white/10 border-white/5 text-white/30"
+              }`}>
+              {m.label}
+            </button>
+          ))}
         </div>
 
-        <GlassPanel className="p-4 md:p-5 space-y-4 md:space-y-5 pointer-events-auto shadow-2xl" xray={sim.xray} darkMode={sim.darkMode}>
+        <GlassPanel className="p-3 md:p-5 space-y-3 md:space-y-5 pointer-events-auto shadow-2xl" xray={sim.xray} darkMode={sim.darkMode}>
           <div>
-            <div className="flex justify-between items-center mb-3 md:mb-4">
-              <div className="text-[8px] md:text-[9px] tracking-[0.35em] uppercase font-mono" style={{ color: `${accent}70` }}>System Dynamics</div>
-              {/* Mobile Inspector Toggle */}
-              <button onClick={() => setSim(s => ({...s, running: !s.running}))} className={`md:hidden px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${
-                sim.running ? "bg-red-500/20 border-red-500/50 text-red-500" : "bg-emerald-500/20 border-emerald-500/50 text-emerald-500"
+            <div className="flex justify-between items-center mb-2 md:mb-4">
+              <div className="text-[7px] md:text-[9px] tracking-[0.3em] uppercase font-mono font-black" style={{ color: `${accent}70` }}>BEEE DYNAMICS</div>
+              <button onClick={() => setSim(s => ({...s, running: !s.running}))} className={`md:hidden px-2.5 py-1 rounded-lg text-[7px] font-black uppercase tracking-widest border transition-colors ${
+                sim.running ? "bg-red-500/20 border-red-500/30 text-red-500" : "bg-emerald-500/20 border-emerald-500/30 text-emerald-500"
               }`}>
-                {sim.running ? "Stop Drive" : "Start Drive"}
+                {sim.running ? "STOP" : "START"}
               </button>
             </div>
             
-            <div className="space-y-4 md:space-y-5">
-              <Slider label="Drive Current" unit="A" value={sim.current} min={0.2} max={2.8} step={0.1}
+            <div className="space-y-3 md:space-y-5">
+              <Slider label="Amperage" unit="A" value={sim.current} min={0.2} max={2.8} step={0.1}
                 onChange={(v) => setSim((s) => ({ ...s, current: v }))} xray={sim.xray} darkMode={sim.darkMode} />
-              <Slider label="Step Frequency" unit="Hz" value={sim.frequency} min={1} max={60} step={1}
+              <Slider label="Frequency" unit="Hz" value={sim.frequency} min={1} max={60} step={1}
                 onChange={(v) => setSim((s) => ({ ...s, frequency: v }))} xray={sim.xray} darkMode={sim.darkMode} />
             </div>
           </div>
 
-          <div className="pt-2 border-t border-white/5 grid grid-cols-2 md:grid-cols-2 gap-2">
+          <div className="pt-2 border-t border-white/5 grid grid-cols-2 gap-1.5">
               {[
                 { label: "Holding", value: (sim.current * 0.45).toFixed(2), unit: "N·cm" },
                 { label: "Velocity", value: Math.round((sim.frequency * 60) / 200).toString(), unit: "RPM" },
               ].map(({ label, value, unit }) => (
-                <div key={label} className={`rounded-xl p-2 md:p-2.5 ${isDark ? "bg-white/5" : "bg-slate-50 border border-slate-100"}`}>
-                   <div className="text-[7px] tracking-widest uppercase font-bold text-slate-400 mb-1">{label}</div>
-                   <div className={`text-xs md:text-sm font-mono font-black ${isDark ? "text-white" : "text-slate-900"}`}>{value}</div>
-                   <div className="text-[8px] font-mono opacity-40">{unit}</div>
+                <div key={label} className={`rounded-xl p-1.5 md:p-2.5 ${isDark ? "bg-white/5" : "bg-slate-50 border border-slate-100"}`}>
+                   <div className="text-[6px] tracking-widest uppercase font-bold text-slate-400 mb-0.5">{label}</div>
+                   <div className={`text-[10px] md:text-sm font-mono font-black ${isDark ? "text-white" : "text-slate-900"}`}>{value}</div>
+                   <div className="text-[7px] font-mono opacity-40">{unit}</div>
                 </div>
               ))}
           </div>
 
-          {/* Mobile Inspector Strip */}
-          <div className="md:hidden pt-3 border-t border-white/5">
-             <div className="text-[7px] tracking-widest uppercase font-bold text-slate-400 mb-2">Part Inspector</div>
-             <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {/* Compact Inspector (Mobile Only) */}
+          <div className="md:hidden pt-2 border-t border-white/5">
+             <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
                 {["Casing", "Stator", "Windings", "Rotor", "Bearing", "Frame"].map((name) => {
                   const active = sim.selectedPart === name;
                   return (
-                    <button key={name} className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[9px] uppercase font-black transition-all ${
-                      active ? "bg-blue-600 text-white" : "bg-white/5 text-white/40 border border-white/5"
+                    <button key={name} className={`flex-shrink-0 px-2.5 py-1 rounded-md text-[7px] uppercase font-black transition-all ${
+                      active ? "bg-blue-600 text-white" : "bg-white/5 text-white/30"
                     }`} onClick={(e) => handleClick(name, e)}>
                       {name}
                     </button>
@@ -705,8 +697,8 @@ export default function StepperScene() {
         </GlassPanel>
       </div>
 
-      {/* Visual Modes (Right -> Hidden/Manual on Mobile) */}
-      <div className="absolute right-5 top-1/2 -translate-y-1/2 w-52 space-y-3 z-20 hidden lg:block">
+      {/* Visual Modes (Right -> Sidebar on Tablets/Desktop) */}
+      <div className="absolute right-5 top-1/2 -translate-y-1/2 w-52 space-y-3 z-20 hidden md:block">
         <GlassPanel className="p-4 space-y-3" xray={sim.xray} darkMode={sim.darkMode}>
           <div className="text-[9px] tracking-[0.35em] uppercase font-mono mb-1 text-slate-400">Analysis Modes</div>
           <button
@@ -780,18 +772,18 @@ export default function StepperScene() {
         )}
       </AnimatePresence>
 
-      {/* Footer Status */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20">
-        <GlassPanel className="px-6 py-3" xray={sim.xray} darkMode={sim.darkMode}>
-          <div className="flex items-center gap-6 text-[9px] font-mono tracking-widest uppercase">
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${sim.running ? "bg-emerald-400 animate-pulse" : "bg-red-400"}`} />
+      {/* Footer Status (Always visible, more compact on mobile) */}
+      <div className="absolute bottom-2 md:bottom-5 left-1/2 -translate-x-1/2 z-20 w-fit">
+        <GlassPanel className="px-3 py-1.5 md:px-6 md:py-3" xray={sim.xray} darkMode={sim.darkMode}>
+          <div className="flex items-center gap-3 md:gap-6 text-[7px] md:text-[9px] font-mono tracking-widest uppercase">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${sim.running ? "bg-emerald-400 animate-pulse outline outline-2 outline-emerald-400/20" : "bg-red-400"}`} />
               <span className="opacity-70 font-black">{sim.running ? "Active" : "Halt"}</span>
             </div>
-            <div className="w-px h-3 bg-current opacity-10" />
-            <span className="opacity-50 font-bold">1.8° Step Resolution</span>
-            <div className="w-px h-3 bg-current opacity-10" />
-            <span style={{ color: `${accent}80` }} className="font-bold tracking-[0.3em]">Telemetry Streaming...</span>
+            <div className="w-px h-2 md:h-3 bg-current opacity-10" />
+            <span className="opacity-50 font-bold hidden xs:inline">1.8° Res</span>
+            <div className="w-px h-2 md:h-3 bg-current opacity-10 hidden xs:inline" />
+            <span style={{ color: `${accent}80` }} className="font-bold tracking-[0.2em] md:tracking-[0.3em] truncate max-w-[80px] md:max-w-none">Live Telemetry</span>
           </div>
         </GlassPanel>
       </div>
